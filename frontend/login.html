@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login – LABORA Campus Laboratory Asset Management</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    }
+    .auth-card {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+    }
+    .auth-header { text-align: center; margin-bottom: 28px; }
+    .demo-credentials {
+      background: #f8fafc;
+      border: 1px dashed var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      margin-top: 20px;
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="brand-icon" style="margin: 0 auto 12px auto;">L</div>
+      <h2 style="font-size: 1.5rem; font-weight: 700;">LABORA</h2>
+      <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">Smart Laboratory. Smarter Management.</p>
+    </div>
+
+    <form id="login-form">
+      <div style="margin-bottom: 16px;">
+        <label style="display:block; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px;">Institutional Email</label>
+        <input type="email" id="email" class="input-control" placeholder="name@labora.edu" required>
+      </div>
+
+      <div style="margin-bottom: 22px;">
+        <label style="display:block; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px;">Password</label>
+        <input type="password" id="password" class="input-control" placeholder="••••••••" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;">Sign In to LABORA</button>
+    </form>
+
+    <div class="demo-credentials">
+      <div style="font-weight: 600; margin-bottom: 6px;">Evaluation Quick-Login Credentials:</div>
+      <div><strong>Admin:</strong> admin@labora.edu | <code>Admin@123</code></div>
+      <div><strong>Student:</strong> student.madhu@labora.edu | <code>Student@123</code></div>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          Auth.saveSession(data.token, data.user);
+          showToast('Authentication successful!', 'success');
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 400);
+        } else {
+          showToast(data.message || 'Invalid login.', 'error');
+        }
+      } catch (err) {
+        showToast('Connection error. Ensure backend server is running.', 'error');
+      }
+    });
+  </script>
+</body>
+</html>
